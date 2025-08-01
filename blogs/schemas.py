@@ -8,3 +8,10 @@ class BlogsSchema(BaseModel):
     body: str
     status: Optional[str] = None
     # category: str
+
+
+class UpdateSchema(BlogsSchema):
+    title: Optional[str] = None
+    # category_id: Optional[int] = None
+    description: Optional[str] = None
+    body: Optional[str] = None

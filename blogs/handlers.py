@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
-from blogs.schemas import BlogsSchema
+from blogs.schemas import BlogsSchema,UpdateSchema
 from models.blogs import Blogs
 from models.users import User
 from core.database import SessionLocal
@@ -60,5 +60,38 @@ def remote_blog(blog_id: int):
         session.delete(blog)
         session.commit()
         return " ", 204
+    finally:
+        session.close()
+
+@blog_bp.route("/update/<int:blog_id>", methods=["PATCH"])
+@login_required
+@is_owner
+def blog_update(blog_id: int):
+    data = request.json
+
+    try:
+        updated = UpdateSchema(**data)
+    except ValidationError as e:
+        return jsonify({"error": e.errors()}), 400
+
+    session: Session = SessionLocal()
+    try:
+        blog = session.query(Blogs).get(blog_id)
+
+        if not blog:
+            return jsonify({"error": "Blog not found"}), 404
+        
+        if updated.title is not None:
+            blog.title = updated.title
+        if updated.description is not None:
+            blog.description = updated.description
+        if updated.body is not None:
+            blog.body = updated.body
+
+        session.commit()     
+        return jsonify({"message":"blog updated!"})
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": str(e)}), 500
     finally:
         session.close()
