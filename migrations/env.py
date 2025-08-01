@@ -18,6 +18,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 from core.database import Base
 from models import blogs
+from models import users
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 

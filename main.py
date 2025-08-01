@@ -1,5 +1,5 @@
 from flask import Flask
-# from users.handlers import user_bp
+from users.handlers import user_bp
 from blogs.handlers import blog_bp
 # from category.handlers import category_bp
 
@@ -22,7 +22,7 @@ Backend dasturlashda quyidagi http metodlar bor:
 
 app = Flask(__name__)
 
-# app.register_blueprint(user_bp, url_prefix="/users")
+app.register_blueprint(user_bp, url_prefix="/users")
 app.register_blueprint(blog_bp, url_prefix="/blogs")
 # app.register_blueprint(category_bp, url_prefix="/category")
 
