@@ -3,6 +3,7 @@ from flask import request, jsonify
 
 from core.database import SessionLocal
 from models.users import User
+from models.blogs import Blogs
 from utils.jwt import verify_access
 
 
@@ -48,21 +49,53 @@ def is_admin_user(f):
     return decorated_function
 
 
+# def is_owner(f):
+#     @wraps(f)
+#     def decorated_function(*args, **kwargs):
+#         try:
+#             session = SessionLocal()
+#             user = session.query(User).get(request.user["user_id"])
+#             if not user:
+#                 return jsonify({"error": "User not found"}), 404
+
+#             # Check if the user is the owner of the resource
+#             if user.id != kwargs.get('user_id'):
+#                 return jsonify({"error": "You are not the owner of this resource"}), 403
+#         except Exception as e:
+#             return jsonify({"error": str(e)}), 500
+
+#         return f(*args, **kwargs)
+
+#     return decorated_function
+
+
 def is_owner(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Authorization header required"}), 401
+        
+        token = auth_header.split(" ")[1]
         try:
-            session = SessionLocal()
-            user = session.query(User).get(request.user["user_id"])
-            if not user:
-                return jsonify({"error": "User not found"}), 404
+            payload = verify_access(token)
+            user_id = payload.get("user_id")
+            if not user_id:
+                return jsonify({"error": "Invalid token: no user_id"}), 403
 
-            # Check if the user is the owner of the resource
-            if user.id != kwargs.get('user_id'):
-                return jsonify({"error": "You are not the owner of this resource"}), 403
+            blog_id = kwargs.get("blog_id")
+            session = SessionLocal()
+            blog = session.query(Blogs).get(blog_id)
+            if not blog:
+                return jsonify({"error": "Blog not found"}), 404
+
+            if blog.owner_id != user_id:
+                return jsonify({"error": "You are not the owner"}), 403
+
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": str(e)}), 401
+        finally:
+            session.close()
 
         return f(*args, **kwargs)
-
     return decorated_function
