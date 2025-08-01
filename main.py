@@ -1,7 +1,10 @@
 from flask import Flask
 from users.handlers import user_bp
 from blogs.handlers import blog_bp
-# from category.handlers import category_bp
+from category.handlers import category_bp
+from core.database import engine, Base
+from models import Category
+
 
 """
 Backend dasturlashda quyidagi http metodlar bor:
@@ -18,13 +21,13 @@ Backend dasturlashda quyidagi http metodlar bor:
     DELETE - Ma'lumotni ochirib tashlaydi
 
 """
-
+Base.metadata.create_all(bind=engine)
 
 app = Flask(__name__)
 
 app.register_blueprint(user_bp, url_prefix="/users")
 app.register_blueprint(blog_bp, url_prefix="/blogs")
-# app.register_blueprint(category_bp, url_prefix="/category")
+app.register_blueprint(category_bp, url_prefix="/category")
 
 if __name__ == "__main__":
     app.run(debug=True)
