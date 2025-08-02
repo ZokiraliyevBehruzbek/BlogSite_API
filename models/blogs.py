@@ -20,10 +20,10 @@ class Blogs(Base):
     body = Column(String(1000))
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     # created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    # category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    category = relationship("Category", backref="blogs")
+    # category = relationship("Category", back_populates="products")
 
     status = Column(Enum(ClassType), default=ClassType.Pending)
     owner = relationship("User", back_populates="blogs")
 
-
-    # category = relationship("Category", back_populates="products")

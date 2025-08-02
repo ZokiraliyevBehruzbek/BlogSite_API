@@ -7,7 +7,7 @@ class BlogsSchema(BaseModel):
     description: str
     body: str
     status: Optional[str] = None
-    # category: str
+    category_id: int 
 
 
 class UpdateSchema(BlogsSchema):
@@ -15,3 +15,6 @@ class UpdateSchema(BlogsSchema):
     # category_id: Optional[int] = None
     description: Optional[str] = None
     body: Optional[str] = None
+
+class UpdateStatus(BaseModel):
+    status: str

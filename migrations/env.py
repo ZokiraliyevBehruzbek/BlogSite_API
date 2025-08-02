@@ -19,6 +19,7 @@ if config.config_file_name is not None:
 from core.database import Base
 from models import blogs
 from models import users
+from models import category
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
